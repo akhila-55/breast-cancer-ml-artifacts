@@ -48,6 +48,8 @@ jobs:
         with:
           name: breast-cancer-ml-artifacts
           path: |
-            breast_cancer_model_missing.pkl
+            breast_cancer_model.pkl
+            metrics.json
+            breast_cancer_v1_100.csv
           if-no-files-found: error
           retention-days: 7
