@@ -1,0 +1,55 @@
+name: Breast Cancer ML Artifacts
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  train-and-preserve:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ML dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Train breast cancer model
+        run: |
+          python train_model.py
+
+      - name: Check ML quality gate
+        run: |
+          python quality_gate.py
+
+      - name: Run automated ML tests
+        run: |
+          python -m unittest discover -v
+
+      - name: Upload validated ML artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: breast-cancer-ml-artifacts
+          path: |
+            breast_cancer_model.pkl
+            metrics.json
+            breast_cancer_v1_100.csv
+          if-no-files-found: error
+          retention-days: 7
